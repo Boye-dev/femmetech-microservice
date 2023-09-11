@@ -62,4 +62,11 @@ module.exports = async (fastify) => {
       reply.code(500).send(error);
     }
   });
+  fastify.get("/", async (request, reply) => {
+    try {
+      reply.code(200).send({ message: "Authenticated" });
+    } catch (error) {
+      reply.code(500).send(error);
+    }
+  });
 };
