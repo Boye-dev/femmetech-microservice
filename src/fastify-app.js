@@ -3,7 +3,7 @@ const cors = require("@fastify/cors");
 module.exports = async (app) => {
   // Register Fastify plugins
   app.register(cors, {
-    origin: "*",
+    origin: "http://localhost:5000",
     methods: ["GET", "POST", "PUT", "DELETE"],
   });
 
