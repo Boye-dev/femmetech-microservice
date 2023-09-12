@@ -327,7 +327,7 @@ class UserService {
       return FormateData(null);
     } catch (error) {
       throw new APIError(
-        "Error sending reset email",
+        "Error adding schedule",
         error.statusCode,
         error.message
       );

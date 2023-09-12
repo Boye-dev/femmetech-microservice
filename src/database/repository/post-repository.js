@@ -6,9 +6,9 @@ const {
 } = require("../../utils/app-errors");
 
 class PostRepository {
-  async CreatePost({ userId, text, images }) {
+  async CreatePost({ user, text, images }) {
     try {
-      const createdPost = new PostModel({ userId, text, images });
+      const createdPost = new PostModel({ user, text, images });
       const postResult = await createdPost.save();
       return postResult;
     } catch (error) {
@@ -29,7 +29,7 @@ class PostRepository {
       return updatedPost;
     } catch (error) {
       throw new APIError(
-        "Unable to find user",
+        "Unable to find post",
         error.statusCode,
         error.message
       );
@@ -42,19 +42,14 @@ class PostRepository {
       return post;
     } catch (error) {
       throw new APIError(
-        "Unable to find user",
+        "Unable to find post",
         error.statusCode,
         error.message
       );
     }
   }
 
-  async FindAllPosts(
-    pageNumber = 1,
-    pageSize = 10,
-    sortBy = "createdAt",
-    sortOrder = "desc"
-  ) {
+  async FindAllPosts(pageNumber, pageSize, sortBy, sortOrder) {
     try {
       let query = PostModel.find({});
 
@@ -72,11 +67,11 @@ class PostRepository {
 
       const posts = await query
         .populate({
-          path: "userId",
+          path: "user",
           select: "firstname lastname profilePicture",
         })
         .populate({
-          path: "comments.userId",
+          path: "comments.user",
           select: "firstname lastname profilePicture",
         })
         .exec();
@@ -85,7 +80,7 @@ class PostRepository {
       return paginatedPosts;
     } catch (error) {
       throw new APIError(
-        "Unable to find users",
+        "Unable to find posts",
         error.statusCode,
         error.message
       );

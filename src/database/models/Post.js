@@ -3,7 +3,7 @@ const { Schema } = require("mongoose");
 
 const PostSchema = new Schema(
   {
-    userId: {
+    user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "user",
     },
@@ -12,7 +12,7 @@ const PostSchema = new Schema(
     likes: { type: Number, default: 0 },
     comments: [
       {
-        userId: {
+        user: {
           type: mongoose.Schema.Types.ObjectId,
           ref: "user",
         },

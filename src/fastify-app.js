@@ -13,6 +13,7 @@ module.exports = async (app) => {
   // API routes
   app.register(require("./api/user"), { prefix: "/api" });
   app.register(require("./api/post"), { prefix: "/api" });
+  app.register(require("./api/journal"), { prefix: "/api" });
 
   //error handling
   app.setErrorHandler((error, request, reply) => {

@@ -12,11 +12,11 @@ class PostService {
   }
 
   async AddPost(userInputs) {
-    const { files, text, userId } = userInputs;
+    const { files, text, user } = userInputs;
     try {
       const imageUrls = await UploadMultipleToS3(files);
       const newPost = await this.repository.CreatePost({
-        userId,
+        user,
         text,
         images: imageUrls,
       });
@@ -30,12 +30,12 @@ class PostService {
       );
     }
   }
-  async AddComment({ text, userId, id }) {
+  async AddComment({ text, user, id }) {
     try {
       const post = await this.repository.FindPostById({ id });
       const newComment = {
-        userId: userId,
-        text: text,
+        user,
+        text,
       };
 
       post.comments.push(newComment);
@@ -56,9 +56,14 @@ class PostService {
     }
   }
 
-  async GetPosts(pageNumber = 1, pageSize = 10) {
+  async GetPosts(pageNumber, pageSize, sortBy, sortOrder) {
     try {
-      const posts = await this.repository.FindAllPosts(pageNumber, pageSize);
+      const posts = await this.repository.FindAllPosts(
+        pageNumber,
+        pageSize,
+        sortBy,
+        sortOrder
+      );
       if (posts) return FormateData(posts);
       return FormateData(null);
     } catch (error) {
