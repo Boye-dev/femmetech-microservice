@@ -3,7 +3,8 @@ const cors = require("@fastify/cors");
 module.exports = async (app) => {
   // Register Fastify plugins
   app.register(cors, {
-    origin: true,
+    origin: "*",
+    methods: ["GET", "POST", "PUT", "DELETE"],
   });
 
   // Middleware for JSON and URL-encoded form data
