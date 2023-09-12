@@ -1,8 +1,10 @@
 const HandleErrors = require("./utils/error-handler");
-
+const cors = require("@fastify/cors");
 module.exports = async (app) => {
   // Register Fastify plugins
-  app.register(require("@fastify/cors"));
+  app.register(cors, {
+    origin: true,
+  });
 
   // Middleware for JSON and URL-encoded form data
   app.register(require("@fastify/formbody"));
