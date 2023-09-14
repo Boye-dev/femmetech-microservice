@@ -76,7 +76,7 @@ class UserService {
         _id: existingUser._id,
         role: existingUser.role,
       });
-      return FormateData({ _id: existingUser._id, token });
+      return FormateData({ _id: existingUser._id, token, role });
     } catch (error) {
       throw new APIError("Error signining in", error.statusCode, error.message);
     }
