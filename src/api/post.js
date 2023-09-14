@@ -33,8 +33,10 @@ module.exports = async (fastify) => {
     { preHandler: [UserAuth] },
     async (request, reply) => {
       try {
+        const { userId } = request.body;
+
         const { id } = request.params;
-        const { data } = await service.LikePost({ id });
+        const { data } = await service.LikePost({ id, userId });
         reply.code(200).send(data);
       } catch (error) {
         reply.code(500).send(error);
