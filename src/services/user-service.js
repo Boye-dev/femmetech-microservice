@@ -75,6 +75,7 @@ class UserService {
         lastname: existingUser.lastname,
         _id: existingUser._id,
         role: existingUser.role,
+        profilePicture: existingUser.profilePicture,
       });
       return FormateData({
         _id: existingUser._id,
