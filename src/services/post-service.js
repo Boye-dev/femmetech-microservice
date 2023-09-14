@@ -75,15 +75,16 @@ class PostService {
     }
   }
 
-  async LikePost({ id }) {
+  async LikePost({ id, userId }) {
     try {
       const post = await this.repository.FindPostById({ id });
 
       if (!post) {
         throw new BadRequestError("Post not found", 400);
       }
-      let likes = post.likes;
-      post.likes = likes + 1;
+
+      post.likes.push(userId);
+
       const postLiked = await post.save();
       if (postLiked) {
         return FormateData({ postLiked, message: "Post Liked Successfully" });
