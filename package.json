@@ -16,7 +16,6 @@
     "@fastify/cookie": "^9.0.4",
     "@fastify/cors": "^8.3.0",
     "@fastify/formbody": "^7.4.0",
-    "@fastify/jwt": "^7.2.1",
     "@fastify/multipart": "^6.0.0",
     "@fastify/under-pressure": "^8.3.0",
     "@fastify/websocket": "^8.2.0",
