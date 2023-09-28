@@ -4,7 +4,7 @@ const WebSocket = require("websocket").server;
 module.exports = async (app) => {
   // Register Fastify plugins
   app.register(require("@fastify/cors"), {
-    origin: ["http://localhost:5000"],
+    origin: ["http://localhost:5000", "https://femmetech.vercel.app"],
     methods: ["GET", "POST", "DELETE", "PUT"],
     credentials: true,
   });
@@ -16,7 +16,7 @@ module.exports = async (app) => {
   }); // For handling file uploads (Multer equivalent)
   app.register(require("fastify-socket.io"), {
     cors: {
-      origin: "http://localhost:5000",
+      origin: ["http://localhost:5000", "https://femmetech.vercel.app"],
       methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
     },
   });
