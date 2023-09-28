@@ -37,7 +37,15 @@ class PostRepository {
   }
   async FindPostById({ id }) {
     try {
-      const post = await PostModel.findById(id);
+      const post = await PostModel.findById(id)
+        .populate({
+          path: "user",
+          select: "firstname lastname profilePicture",
+        })
+        .populate({
+          path: "comments.user",
+          select: "firstname lastname profilePicture",
+        });
 
       return post;
     } catch (error) {

@@ -1,4 +1,5 @@
-const { UserRepository } = require("../database");
+const { UserRepository, ChatRepository } = require("../database");
+const { ChatModel } = require("../database/models");
 const {
   FormateData,
   GeneratePassword,
@@ -19,13 +20,65 @@ const { verificationEmail, passwordResetEmail } = require("../utils/emails");
 class UserService {
   constructor() {
     this.repository = new UserRepository();
+    this.chatRepository = new ChatRepository();
   }
-  async GetAllUsers() {
+  async GetAllUsers({ id }) {
     try {
-      const users = await this.repository.FindAllUsers({ isVerified: true });
+      // Find the user by ID
+      console.log(id);
+      const user = await this.repository.FindUserById({ id });
+
+      if (!user) {
+        throw new BadRequestError("User not found", 400);
+      }
+      const pageNumber = -1;
+
+      const pageSize = 10;
+      const sortBy = "createdAt";
+      const sortOrder = "desc";
+
+      const chatMembers = await this.chatRepository.FindAllChats(
+        pageNumber,
+        pageSize,
+        sortBy,
+        sortOrder,
+        id
+      );
+      let chatMemberIds = [];
+      chatMembers.chats.forEach((chat) => {
+        chatMemberIds = chatMemberIds.concat(
+          chat.members.map((member) => member.user._id.toString())
+        );
+      });
+      const uniqueChatMemberIds = Array.from(new Set(chatMemberIds));
+      const users = await this.repository.FindAllUsers({
+        _id: { $ne: id, $nin: uniqueChatMemberIds },
+        isVerified: true,
+      });
+
+      return FormateData(users);
+    } catch (error) {
+      throw new APIError(
+        "Error getting users",
+        error.statusCode,
+        error.message
+      );
+    }
+  }
+  async GetAllConsultants() {
+    try {
+      // Find the user by ID
+
+      const users = await this.repository.FindAllUsers({
+        role: "CONSULTANT",
+        isVerified: true,
+        schedule: { $exists: true },
+      });
+
       if (!users) {
         throw new BadRequestError("Users not found", 400);
       }
+
       return FormateData(users);
     } catch (error) {
       throw new APIError(
@@ -77,11 +130,28 @@ class UserService {
         role: existingUser.role,
         profilePicture: existingUser.profilePicture,
       });
-      return FormateData({
-        _id: existingUser._id,
-        token,
-        role: existingUser.role,
-      });
+      if (existingUser.schedule && existingUser.role === "CONSULTANT") {
+        return FormateData({
+          _id: existingUser._id,
+          token,
+          role: existingUser.role,
+          scheduleSet: true,
+        });
+      } else if (existingUser.role === "PATIENT") {
+        return FormateData({
+          _id: existingUser._id,
+          token,
+          role: existingUser.role,
+          scheduleSet: true,
+        });
+      } else {
+        return FormateData({
+          _id: existingUser._id,
+          token,
+          role: existingUser.role,
+          scheduleSet: false,
+        });
+      }
     } catch (error) {
       throw new APIError("Error signining in", error.statusCode, error.message);
     }

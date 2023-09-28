@@ -1,5 +1,6 @@
+const { socket } = require("./socket");
 const HandleErrors = require("./utils/error-handler");
-
+const WebSocket = require("websocket").server;
 module.exports = async (app) => {
   // Register Fastify plugins
   app.register(require("@fastify/cors"), {
@@ -13,11 +14,23 @@ module.exports = async (app) => {
   app.register(require("@fastify/multipart"), {
     attachFieldsToBody: true, // This option attaches parsed fields to request.body
   }); // For handling file uploads (Multer equivalent)
+  app.register(require("fastify-socket.io"), {
+    cors: {
+      origin: "http://localhost:5000",
+      methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+    },
+  });
+
+  // Initialize Socket.io
+  socket(app);
 
   // API routes
   app.register(require("./api/user"), { prefix: "/api" });
   app.register(require("./api/post"), { prefix: "/api" });
   app.register(require("./api/journal"), { prefix: "/api" });
+  app.register(require("./api/chat"), { prefix: "/api" });
+  app.register(require("./api/message"), { prefix: "/api" });
+  app.register(require("./api/appointment"), { prefix: "/api" });
 
   //error handling
   app.setErrorHandler((error, request, reply) => {

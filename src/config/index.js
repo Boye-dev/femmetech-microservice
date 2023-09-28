@@ -18,5 +18,5 @@ module.exports = {
   NODEMAILER_EMAIL: "oyelolaboye@gmail.com",
   NODEMAILER_PASSWORD: "qkpdgiwklyuaoyxh",
   CLOUDFRONTURL: process.env.CLOUDFRONTURL,
-  NODEMAILER_EMAIL_HOST: "http://localhost:3001/",
+  NODEMAILER_EMAIL_HOST: "http://localhost:5000",
 };

@@ -8,6 +8,7 @@ module.exports = async (fastify) => {
   //SIGNUP
   fastify.post("/signup", async (request, reply) => {
     try {
+      console.log(request.body);
       const firstname = request.body.firstname.value;
       const phone = request.body.phone.value;
       const email = request.body.email.value;
@@ -181,9 +182,11 @@ module.exports = async (fastify) => {
   });
 
   //GET ALL USERS
-  fastify.get("/users", async (request, reply) => {
+  fastify.get("/users/chat/:id", async (request, reply) => {
     try {
-      const { data } = await service.GetAllUsers();
+      const { id } = request.params;
+
+      const { data } = await service.GetAllUsers({ id });
 
       reply.code(200).send(data);
     } catch (error) {
@@ -197,6 +200,17 @@ module.exports = async (fastify) => {
       const { id } = request.params;
 
       const { data } = await service.GetUserById({ id });
+
+      reply.code(200).send(data);
+    } catch (error) {
+      reply.code(500).send(error);
+    }
+  });
+
+  //GET CONSULTANTS
+  fastify.get("/consultants", async (request, reply) => {
+    try {
+      const { data } = await service.GetAllConsultants();
 
       reply.code(200).send(data);
     } catch (error) {

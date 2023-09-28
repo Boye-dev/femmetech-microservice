@@ -24,6 +24,7 @@ const PostSchema = new Schema(
           ref: "user",
         },
         text: { type: String },
+        createdAt: { type: Date },
       },
     ],
   },

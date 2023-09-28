@@ -15,6 +15,9 @@ class PostService {
     const { files, text, user } = userInputs;
     try {
       const imageUrls = await UploadMultipleToS3(files);
+      if (!imageUrls) {
+        imageUrls = [];
+      }
       const newPost = await this.repository.CreatePost({
         user,
         text,
@@ -36,6 +39,7 @@ class PostService {
       const newComment = {
         user,
         text,
+        createdAt: new Date(),
       };
 
       post.comments.push(newComment);
@@ -43,13 +47,18 @@ class PostService {
       const savedPost = await post.save();
 
       if (savedPost) {
+        await savedPost.populate({
+          path: "comments.user",
+          select: "firstname lastname profilePicture",
+        });
+
         return FormateData(savedPost);
       }
 
       return FormateData(null);
     } catch (error) {
       throw new APIError(
-        "Error creating post",
+        "Error creating comment",
         error.statusCode,
         error.message
       );
@@ -74,7 +83,19 @@ class PostService {
       );
     }
   }
-
+  async GetPostById({ id }) {
+    try {
+      const posts = await this.repository.FindPostById({ id });
+      if (posts) return FormateData(posts);
+      return FormateData(null);
+    } catch (error) {
+      throw new APIError(
+        "Unable to get posts",
+        error.statusCode,
+        error.message
+      );
+    }
+  }
   async LikePost({ id, userId }) {
     try {
       const post = await this.repository.FindPostById({ id });
@@ -83,7 +104,14 @@ class PostService {
         throw new BadRequestError("Post not found", 400);
       }
 
-      post.likes.push(userId);
+      const hasLiked = post.likes.find(
+        (item) => item.user.toString() === userId
+      );
+
+      if (hasLiked) {
+        throw new BadRequestError("Post has been liked by you", 400);
+      }
+      post.likes.push({ user: userId });
 
       const postLiked = await post.save();
       if (postLiked) {

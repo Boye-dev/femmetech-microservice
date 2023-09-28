@@ -75,7 +75,7 @@ class JournalRepository {
         query = query.skip(skip).limit(pageSize);
       }
 
-      const totalCount = await JournalModel.countDocuments();
+      const totalCount = await JournalModel.countDocuments({ user });
 
       const validSortOrder = sortOrder === "asc" ? 1 : -1;
 

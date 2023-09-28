@@ -50,8 +50,53 @@ module.exports.UploadMultipleToS3 = async (files) => {
       return s3
         .send(command)
         .then(() => {
-          const url = "https://d1sjqjxm0h9myg.cloudfront.net/" + key;
+          const url = CLOUDFRONTURL + key;
           return url;
+        })
+        .catch((error) => {
+          console.error("Error uploading file:", error);
+          throw error;
+        });
+    });
+    const fileKeys = await Promise.all(filePromises);
+
+    return fileKeys;
+  } catch (error) {
+    throw error;
+  }
+};
+module.exports.UploadMultipleToS3WithFileType = async (files) => {
+  const s3 = new S3Client({
+    credentials: {
+      accessKeyId: AWS_ACCESS_KEY_ID,
+      secretAccessKey: AWS_SECRET_ACCESS_KEY,
+    },
+    region: S3_REGION,
+  });
+
+  const bucketName = S3_BUCKET;
+
+  try {
+    if (!files || files.length === 0) {
+      console.log("No files were provided for upload.");
+      return [];
+    }
+
+    const filePromises = files.map(async (file) => {
+      const key = `${uuidv4()}-${file.filename}`;
+      const params = {
+        Bucket: bucketName,
+        Key: key,
+        Body: file._buf,
+        ContentType: file.mimetype,
+      };
+      const command = new PutObjectCommand(params);
+
+      return s3
+        .send(command)
+        .then(() => {
+          const url = CLOUDFRONTURL + key;
+          return { url, filetype: file.mimetype };
         })
         .catch((error) => {
           console.error("Error uploading file:", error);

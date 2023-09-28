@@ -16,7 +16,7 @@ module.exports = async (fastify) => {
         const user = request.body.user.value;
         let files = request.body.files;
 
-        if (!Array.isArray(files)) {
+        if (!Array.isArray(files) && files) {
           files = [files];
         }
         const { data } = await service.AddPost({ text, user, files });
@@ -82,6 +82,20 @@ module.exports = async (fastify) => {
       reply.code(500).send(error);
     }
   });
+  fastify.get(
+    "/post/:id",
+    { preHandler: [UserAuth] },
+    async (request, reply) => {
+      try {
+        const { id } = request.params;
+
+        const { data } = await service.GetPostById({ id });
+        reply.code(200).send(data);
+      } catch (error) {
+        reply.code(500).send(error);
+      }
+    }
+  );
   fastify.get("/", async (request, reply) => {
     try {
       reply.code(200).send({ message: "Authenticated" });
