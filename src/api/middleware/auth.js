@@ -1,15 +1,16 @@
 const { ValidateSignature } = require("../../utils");
 
-module.exports = async (request, reply) => {
+module.exports = async (req, res, next) => {
   try {
-    const isAuthorized = await ValidateSignature(request);
+    const isAuthorized = await ValidateSignature(req);
 
     if (isAuthorized) {
-      return;
+      next(); // Continue to the next middleware or route handler
+    } else {
+      res.status(403).send({ message: "Not Authorized" });
     }
-    reply.status(403).send({ message: "Not Authorized" });
   } catch (error) {
     console.error("Authorization error:", error);
-    reply.status(500).send({ message: "Internal Server Error" });
+    res.status(500).send({ message: "Internal Server Error" });
   }
 };

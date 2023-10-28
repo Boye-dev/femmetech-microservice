@@ -18,6 +18,9 @@ const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
 const { v4: uuidv4 } = require("uuid");
 
 //Utility functions
+const multer = require("multer");
+
+module.exports.upload = multer();
 
 module.exports.UploadMultipleToS3 = async (files) => {
   const s3 = new S3Client({
@@ -37,12 +40,12 @@ module.exports.UploadMultipleToS3 = async (files) => {
     }
 
     const filePromises = files.map(async (file) => {
-      const key = `${uuidv4()}-${file.filename}`;
+      const key = `${uuidv4()}-${file.originalname}`;
       console.log(file.mimetype);
       const params = {
         Bucket: bucketName,
         Key: key,
-        Body: file._buf,
+        Body: file.buffer,
         ContentType: file.mimetype,
       };
       const command = new PutObjectCommand(params);
@@ -83,11 +86,12 @@ module.exports.UploadMultipleToS3WithFileType = async (files) => {
     }
 
     const filePromises = files.map(async (file) => {
-      const key = `${uuidv4()}-${file.filename}`;
+      const key = `${uuidv4()}-${file.originalname}`;
+      console.log(file.mimetype);
       const params = {
         Bucket: bucketName,
         Key: key,
-        Body: file._buf,
+        Body: file.buffer,
         ContentType: file.mimetype,
       };
       const command = new PutObjectCommand(params);
