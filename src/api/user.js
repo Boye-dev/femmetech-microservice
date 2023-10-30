@@ -96,13 +96,13 @@ router.post("/reset-password/:token", async (req, res) => {
 
 /* --------------- PUT ENDPOINTS --------------- */
 // EDIT PROFILE
-router.put("/edit-profile/:id", upload.single("files"), async (req, res) => {
+router.put("/edit-profile/:id", upload.array("files"), async (req, res) => {
   try {
     const firstname = req.body.firstname;
     const phone = req.body.phone;
     const lastname = req.body.lastname;
     const { id } = req.params;
-
+    console.log({ fileBoye: req.body });
     let files = req.files;
     if (!Array.isArray(files) && files) {
       files = [files];
@@ -116,6 +116,7 @@ router.put("/edit-profile/:id", upload.single("files"), async (req, res) => {
       id,
     });
 
+    console.log({ id, data });
     res.status(200).json(data);
   } catch (error) {
     if (error instanceof BadRequestError) {

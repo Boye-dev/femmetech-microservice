@@ -19,16 +19,6 @@ module.exports = async (app) => {
 
   // For handling file uploads (Multer equivalent)
 
-  // Initialize Socket.io
-
-  // API routes
-  app.use("/api", require("./api/user"));
-  app.use("/api", require("./api/post"));
-  app.use("/api", require("./api/journal"));
-  app.use("/api", require("./api/chat"));
-  app.use("/api", require("./api/message"));
-  app.use("/api", require("./api/appointment"));
-
   // Error handling middleware
   app.use((error, request, response, next) => {
     const statusCode = error.statusCode || 500;
@@ -38,4 +28,12 @@ module.exports = async (app) => {
       message: error.message || "An error occurred.",
     });
   });
+
+  // API routes
+  app.use("/api", require("./api/user"));
+  app.use("/api", require("./api/post"));
+  app.use("/api", require("./api/journal"));
+  app.use("/api", require("./api/chat"));
+  app.use("/api", require("./api/message"));
+  app.use("/api", require("./api/appointment"));
 };

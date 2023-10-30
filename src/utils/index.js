@@ -134,12 +134,12 @@ module.exports.UploadSingleToS3 = async (files) => {
     }
     const file = files[0];
 
-    const key = `${uuidv4()}-${file.filename}`;
+    const key = `${uuidv4()}-${file.originalname}`;
     console.log(file.mimetype);
     const params = {
       Bucket: bucketName,
       Key: key,
-      Body: file._buf,
+      Body: file.buffer,
       ContentType: file.mimetype,
     };
     const command = new PutObjectCommand(params);
