@@ -26,7 +26,7 @@ const StartServer = async () => {
     // Only start server after connection to database has been established
     const io = new Server(server, {
       cors: {
-        origin: ["http://localhost:5000", "https://femmetech.vercel.app"],
+        origin: ["http://localhost:5000", "https://femmetech.vercel.app","http://localhost:3000"],
       },
     });
 
