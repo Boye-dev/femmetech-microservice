@@ -7,7 +7,7 @@ module.exports = async (app) => {
 
   // Enable CORS
   const corsOptions = {
-    origin: ["http://localhost:5000", "https://femmetech.vercel.app","http://localhost:3000"],
+    origin: ["http://localhost:5173", "https://femmetech.vercel.app","http://localhost:3000"],
     methods: ["GET", "POST", "DELETE", "PUT"],
     credentials: true,
   };
