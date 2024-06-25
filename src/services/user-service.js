@@ -201,6 +201,8 @@ class UserService {
       }
       return FormateData(null);
     } catch (error) {
+      console.log(error);
+
       throw new APIError(
         "Error Creating User",
         error.statusCode,
