@@ -27,7 +27,7 @@ const StartServer = async () => {
     const io = new Server(server, {
       cors: {
         origin: [
-          "https://femmetech-api.boye-dev.com",
+          "https://femmetech.boye-dev.com",
           "http://localhost:5000",
           "https://femmetech.vercel.app",
           "http://localhost:3000",
