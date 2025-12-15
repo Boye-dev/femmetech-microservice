@@ -7,32 +7,48 @@ const {
   APP_SECRET,
   NODEMAILER_EMAIL,
   NODEMAILER_PASSWORD,
-  AWS_ACCESS_KEY_ID,
-  AWS_SECRET_ACCESS_KEY,
-  S3_BUCKET,
-  S3_REGION,
-  CLOUDFRONTURL,
 } = require("../config");
 const amqplib = require("amqplib");
-const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
-const { v4: uuidv4 } = require("uuid");
+const cloudinary = require("cloudinary").v2;
+const { Readable } = require("stream");
 
 //Utility functions
 const multer = require("multer");
 
 module.exports.upload = multer();
 
-module.exports.UploadMultipleToS3 = async (files) => {
-  const s3 = new S3Client({
-    credentials: {
-      accessKeyId: AWS_ACCESS_KEY_ID,
-      secretAccessKey: AWS_SECRET_ACCESS_KEY,
-    },
-    region: S3_REGION,
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+const cloudinaryImageUpload = (imageBuffer, folder, resource_type) => {
+  return new Promise((resolve, reject) => {
+    const uploadStream = cloudinary.uploader.upload_stream(
+      {
+        folder: "FemmeTech",
+        resource_type: resource_type || "auto",
+      },
+      (error, result) => {
+        if (error) {
+          console.error("Error uploading to Cloudinary:", error);
+          reject(error);
+        } else {
+          resolve(result);
+        }
+      }
+    );
+
+    const bufferStream = new Readable();
+    bufferStream.push(imageBuffer);
+    bufferStream.push(null);
+
+    bufferStream.pipe(uploadStream);
   });
+};
 
-  const bucketName = S3_BUCKET;
-
+module.exports.UploadMultipleToS3 = async (files) => {
   try {
     if (!files || files.length === 0) {
       console.log("No files were provided for upload.");
@@ -40,26 +56,8 @@ module.exports.UploadMultipleToS3 = async (files) => {
     }
 
     const filePromises = files.map(async (file) => {
-      const key = `${uuidv4()}-${file.originalname}`;
-      console.log(file.mimetype);
-      const params = {
-        Bucket: bucketName,
-        Key: key,
-        Body: file.buffer,
-        ContentType: file.mimetype,
-      };
-      const command = new PutObjectCommand(params);
-
-      return s3
-        .send(command)
-        .then(() => {
-          const url = CLOUDFRONTURL + key;
-          return url;
-        })
-        .catch((error) => {
-          console.error("Error uploading file:", error);
-          throw error;
-        });
+      const result = await cloudinaryImageUpload(file.buffer);
+      return result.secure_url;
     });
     const fileKeys = await Promise.all(filePromises);
 
@@ -69,16 +67,6 @@ module.exports.UploadMultipleToS3 = async (files) => {
   }
 };
 module.exports.UploadMultipleToS3WithFileType = async (files) => {
-  const s3 = new S3Client({
-    credentials: {
-      accessKeyId: AWS_ACCESS_KEY_ID,
-      secretAccessKey: AWS_SECRET_ACCESS_KEY,
-    },
-    region: S3_REGION,
-  });
-
-  const bucketName = S3_BUCKET;
-
   try {
     if (!files || files.length === 0) {
       console.log("No files were provided for upload.");
@@ -86,26 +74,8 @@ module.exports.UploadMultipleToS3WithFileType = async (files) => {
     }
 
     const filePromises = files.map(async (file) => {
-      const key = `${uuidv4()}-${file.originalname}`;
-      console.log(file.mimetype);
-      const params = {
-        Bucket: bucketName,
-        Key: key,
-        Body: file.buffer,
-        ContentType: file.mimetype,
-      };
-      const command = new PutObjectCommand(params);
-
-      return s3
-        .send(command)
-        .then(() => {
-          const url = CLOUDFRONTURL + key;
-          return { url, filetype: file.mimetype };
-        })
-        .catch((error) => {
-          console.error("Error uploading file:", error);
-          throw error;
-        });
+      const result = await cloudinaryImageUpload(file.buffer);
+      return { url: result.secure_url, filetype: file.mimetype };
     });
     const fileKeys = await Promise.all(filePromises);
 
@@ -117,16 +87,6 @@ module.exports.UploadMultipleToS3WithFileType = async (files) => {
 
 module.exports.UploadSingleToS3 = async (files) => {
   console.log(files);
-  const s3 = new S3Client({
-    credentials: {
-      accessKeyId: AWS_ACCESS_KEY_ID,
-      secretAccessKey: AWS_SECRET_ACCESS_KEY,
-    },
-    region: S3_REGION,
-  });
-
-  const bucketName = S3_BUCKET;
-
   try {
     if (!files || files.length === 0) {
       console.log("No files were provided for upload.");
@@ -134,26 +94,8 @@ module.exports.UploadSingleToS3 = async (files) => {
     }
     const file = files[0];
 
-    const key = `${uuidv4()}-${file.originalname}`;
-    console.log(file.mimetype);
-    const params = {
-      Bucket: bucketName,
-      Key: key,
-      Body: file.buffer,
-      ContentType: file.mimetype,
-    };
-    const command = new PutObjectCommand(params);
-
-    return s3
-      .send(command)
-      .then(() => {
-        const url = CLOUDFRONTURL + key;
-        return url;
-      })
-      .catch((error) => {
-        console.error("Error uploading file:", error);
-        throw error;
-      });
+    const result = await cloudinaryImageUpload(file.buffer);
+    return result.secure_url;
   } catch (error) {
     throw error;
   }

@@ -15,8 +15,8 @@ module.exports = {
   AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY,
   S3_REGION: process.env.S3_REGION,
   S3_BUCKET: process.env.S3_BUCKET,
-  NODEMAILER_EMAIL: "oyelolaboye@gmail.com",
-  NODEMAILER_PASSWORD: "qkpdgiwklyuaoyxh",
+  NODEMAILER_EMAIL: process.env.NODEMAILER_EMAIL,
+  NODEMAILER_PASSWORD: process.env.NODEMAILER_PASSWORD,
   CLOUDFRONTURL: process.env.CLOUDFRONTURL,
-  NODEMAILER_EMAIL_HOST: "https://femmetech.vercel.app",
+  NODEMAILER_EMAIL_HOST: process.env.NODEMAILER_EMAIL_HOST,
 };
