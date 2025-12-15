@@ -1,13 +1,20 @@
 const { socket } = require("./socket");
 const express = require("express");
 const HandleErrors = require("./utils/error-handler");
+const config = require("./config");
 
 module.exports = async (app) => {
   // Create an Express app
 
   // Enable CORS
   const corsOptions = {
-    origin: ["http://localhost:5173", "https://femmetech.vercel.app","http://localhost:3000","https://social-media-c79b.vercel.app"],
+    origin: [
+      config.NODEMAILER_EMAIL_HOST,
+      "http://localhost:5173",
+      "https://femmetech.vercel.app",
+      "http://localhost:3000",
+      "https://social-media-c79b.vercel.app",
+    ],
     methods: ["GET", "POST", "DELETE", "PUT"],
     credentials: true,
   };
